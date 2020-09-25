@@ -6,81 +6,64 @@ GROUP BY YEAR(`date_of_birth`);
 
 
 -- 2) Somma i prezzi dei pagamenti raggruppandoli per status
-SELECT
-    `status`, SUM(`price`)
-FROM
-    `pagamenti`
-GROUP BY `status`
+SELECT `status`,
+    SUM(`price`)
+FROM `pagamenti`
+GROUP BY `status` 
+
 
 -- 3) Conta quante volte è stata prenotata ogni stanza
-SELECT
-    stanze.room_number, COUNT(prenotazioni.id)
-FROM
-    `prenotazioni`
-JOIN
-	`stanze`
-ON 
-	prenotazioni.stanza_id = stanze.id
-GROUP BY
-	stanze.room_number
+SELECT stanze.room_number,
+    COUNT(prenotazioni.id)
+FROM `prenotazioni`
+    JOIN `stanze` ON prenotazioni.stanza_id = stanze.id
+GROUP BY stanze.room_number 
 
 
 -- 4) Stampare tutti gli ospiti per ogni prenotazione
-SELECT
-    prenotazioni_has_ospiti.prenotazione_id, ospiti.name, ospiti.lastname
-FROM
-    `prenotazioni_has_ospiti`
-JOIN
-	`ospiti`
-ON
-	prenotazioni_has_ospiti.ospite_id = ospiti.id
-
-
+SELECT prenotazioni_has_ospiti.prenotazione_id,
+    ospiti.name,
+    ospiti.lastname
+FROM `prenotazioni_has_ospiti`
+    JOIN `ospiti` ON prenotazioni_has_ospiti.ospite_id = ospiti.id 
+    
+    
 -- 5) Stampare Nome, Cognome,Prezzo e Pagante per tutte le prenotazioni fatte a Maggio 2018
-SELECT
-    prenotazioni.id AS 'id prenotazione', prenotazioni.created_at, ospiti.id AS 'id ospite', ospiti.name, ospiti.lastname, pagamenti.price, paganti.ospite_id AS 'id pagante', paganti.name, paganti.lastname, EXTRACT(YEAR_MONTH FROM prenotazioni.created_at) AS 'YYYYMM'
-FROM
-    `prenotazioni`
-JOIN
-	`prenotazioni_has_ospiti`
-ON
-	prenotazioni_has_ospiti.prenotazione_id = prenotazioni.id
-JOIN
-	`pagamenti`
-ON
-	pagamenti.prenotazione_id = prenotazioni.id
-JOIN
-	`ospiti`
-ON
-	ospiti.id = prenotazioni_has_ospiti.ospite_id
-JOIN
-	`paganti`
-ON
-	paganti.id = pagamenti.pagante_id
-WHERE
-	EXTRACT(YEAR_MONTH FROM prenotazioni.created_at)= 201805
-
+SELECT prenotazioni.id AS 'id prenotazione',
+    prenotazioni.created_at,
+    ospiti.id AS 'id ospite',
+    ospiti.name,
+    ospiti.lastname,
+    pagamenti.price,
+    paganti.ospite_id AS 'id pagante',
+    paganti.name,
+    paganti.lastname,
+    EXTRACT(
+        YEAR_MONTH
+        FROM prenotazioni.created_at
+    ) AS 'YYYYMM'
+FROM `prenotazioni`
+    JOIN `prenotazioni_has_ospiti` ON prenotazioni_has_ospiti.prenotazione_id = prenotazioni.id
+    JOIN `pagamenti` ON pagamenti.prenotazione_id = prenotazioni.id
+    JOIN `ospiti` ON ospiti.id = prenotazioni_has_ospiti.ospite_id
+    JOIN `paganti` ON paganti.id = pagamenti.pagante_id
+WHERE EXTRACT(
+        YEAR_MONTH
+        FROM prenotazioni.created_at
+    ) = 201805 
+    
+    
 -- 6) Fai la somma di tutti i prezzi delle prenotazioni per le stanze del primo piano
+SELECT stanze.floor,
+    SUM(pagamenti.price)
+FROM `prenotazioni`
+    JOIN `pagamenti` ON pagamenti.prenotazione_id = prenotazioni.id
+    JOIN `stanze` ON stanze.id = prenotazioni.stanza_id
+WHERE stanze.floor = 1 
 
-SELECT
-     stanze.floor , SUM(pagamenti.price)
-FROM
-    `prenotazioni`
-JOIN
-	`pagamenti`
-ON
-	pagamenti.prenotazione_id = prenotazioni.id
-JOIN
-	`stanze`
-ON
-	stanze.id = prenotazioni.stanza_id
-WHERE
-	stanze.floor = 1
 
 -- 7) Prendi i dati di fatturazione per la prenotazione con id = 7
-
-SELECT
-    prenotazioni.id AS 'id prenotazione',
+SELECT prenotazioni.id AS 'id prenotazione',
     prenotazioni.created_at AS 'data prenotazione',
     stanze.room_number,
     stanze.floor,
@@ -90,13 +73,11 @@ SELECT
     paganti.name AS 'nome pagante',
     paganti.lastname AS 'cognome pagante',
     pagamenti.price
-FROM
-    `prenotazioni`
-JOIN `pagamenti` ON prenotazioni.id = pagamenti.prenotazione_id
-JOIN `stanze` ON stanze.id = prenotazioni.stanza_id
-JOIN `configurazioni` ON configurazioni.id = prenotazioni.configurazione_id
-JOIN `paganti`
-ON
-    paganti.id = pagamenti.pagante_id
-JOIN `prenotazioni_has_ospiti` ON prenotazioni.id = prenotazioni_has_ospiti.prenotazione_id
-JOIN `ospiti` ON prenotazioni_has_ospiti.ospite_id = ospiti.id
+FROM `prenotazioni`
+    JOIN `pagamenti` ON prenotazioni.id = pagamenti.prenotazione_id
+    JOIN `stanze` ON stanze.id = prenotazioni.stanza_id
+    JOIN `configurazioni` ON configurazioni.id = prenotazioni.configurazione_id
+    JOIN `paganti` ON paganti.id = pagamenti.pagante_id
+    JOIN `prenotazioni_has_ospiti` ON prenotazioni.id = prenotazioni_has_ospiti.prenotazione_id
+    JOIN `ospiti` ON prenotazioni_has_ospiti.ospite_id = ospiti.id
+WHERE prenotazioni.id = 7
