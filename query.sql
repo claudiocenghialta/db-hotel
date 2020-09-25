@@ -14,9 +14,9 @@ WHERE YEAR(`date_of_birth`) >= 1988;
 
 -- 3.  Seleziona tutti gli ospiti che hanno più di 20 anni
 --     (al momento dell’esecuzione della query)
-SELECT *, (NOW()-`date_of_birth`)
+SELECT *
 FROM `ospiti`
-WHERE `date_of_birth`<= DATE_SUB(CURDATE(),INTERVAL 21 YEAR);
+WHERE `date_of_birth`<= DATE_SUB(CURDATE(),INTERVAL 20 YEAR);
 
 
 -- 4.  Seleziona tutti gli ospiti il cui nome inizia con la D
@@ -26,12 +26,13 @@ WHERE `name` LIKE  'D%';
 
 
 -- 5. Calcolare il totale degli ospiti paganti
-SELECT COUNT(`pagante_id`)
-FROM `pagamenti` ;
+SELECT COUNT(`ospite_id`)
+FROM `paganti`
 
 -- 6.  Qual è il prezzo massimo pagato?
 SELECT MAX(`price`)
-FROM `pagamenti`;
+FROM `pagamenti`
+WHERE `status`='accepted';
 
 -- 7. Seleziona gli ospiti riconosciuti con patente e nati nel 1975
 SELECT *
