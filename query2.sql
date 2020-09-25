@@ -61,4 +61,42 @@ WHERE
 	EXTRACT(YEAR_MONTH FROM prenotazioni.created_at)= 201805
 
 -- 6) Fai la somma di tutti i prezzi delle prenotazioni per le stanze del primo piano
+
+SELECT
+     stanze.floor , SUM(pagamenti.price)
+FROM
+    `prenotazioni`
+JOIN
+	`pagamenti`
+ON
+	pagamenti.prenotazione_id = prenotazioni.id
+JOIN
+	`stanze`
+ON
+	stanze.id = prenotazioni.stanza_id
+WHERE
+	stanze.floor = 1
+
 -- 7) Prendi i dati di fatturazione per la prenotazione con id = 7
+
+SELECT
+    prenotazioni.id AS 'id prenotazione',
+    prenotazioni.created_at AS 'data prenotazione',
+    stanze.room_number,
+    stanze.floor,
+    configurazioni.title,
+    ospiti.name AS ' nome ospite',
+    ospiti.lastname AS 'cognome ospite',
+    paganti.name AS 'nome pagante',
+    paganti.lastname AS 'cognome pagante',
+    pagamenti.price
+FROM
+    `prenotazioni`
+JOIN `pagamenti` ON prenotazioni.id = pagamenti.prenotazione_id
+JOIN `stanze` ON stanze.id = prenotazioni.stanza_id
+JOIN `configurazioni` ON configurazioni.id = prenotazioni.configurazione_id
+JOIN `paganti`
+ON
+    paganti.id = pagamenti.pagante_id
+JOIN `prenotazioni_has_ospiti` ON prenotazioni.id = prenotazioni_has_ospiti.prenotazione_id
+JOIN `ospiti` ON prenotazioni_has_ospiti.ospite_id = ospiti.id
